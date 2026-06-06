@@ -12,7 +12,6 @@ import { PurchaseOrders } from './pages/PurchaseOrders';
 import { Invoice } from './pages/Invoice';
 import { ActivityLog } from './pages/ActivityLog';
 import { ReportsAnalytics } from './pages/ReportsAnalytics';
-import { ApprovalWorkflow } from './pages/ApprovalWorkflow';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 import { LandingPage } from './pages/LandingPage';
@@ -44,7 +43,6 @@ function App() {
           <Route path="/vendors" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><Vendors /></ProtectedRoute>} />
           <Route path="/activity" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><ActivityLog /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><ReportsAnalytics /></ProtectedRoute>} />
-          <Route path="/approvals" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><ApprovalWorkflow /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute allowedRoles={['Procurement Officer']}><Settings /></ProtectedRoute>} />
         </Routes>
       </Router>

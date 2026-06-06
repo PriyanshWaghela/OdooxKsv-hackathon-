@@ -9,7 +9,6 @@ export function Sidebar() {
     { name: 'Dashboard', path: '/dashboard', icon: 'dashboard', roles: ['Procurement Officer', 'Vendor', 'Approver'] },
     { name: 'RFQs', path: '/rfqs', icon: 'request_quote', roles: ['Procurement Officer', 'Vendor', 'Approver'] },
     { name: 'Compare Quotes', path: '/compare', icon: 'compare_arrows', roles: ['Procurement Officer', 'Approver'] },
-    { name: 'Approvals', path: '/approvals', icon: 'fact_check', roles: ['Approver', 'Procurement Officer'] },
     { name: 'Purchase Orders', path: '/purchase-orders', icon: 'receipt_long', roles: ['Procurement Officer', 'Approver', 'Vendor'] },
     { name: 'Vendors', path: '/vendors', icon: 'factory', roles: ['Procurement Officer', 'Approver'] },
     { name: 'Activity', path: '/activity', icon: 'list_alt', roles: ['Procurement Officer', 'Approver'] },
