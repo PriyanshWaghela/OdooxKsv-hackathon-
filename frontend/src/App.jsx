@@ -11,7 +11,11 @@ import { SubmitQuote } from './pages/SubmitQuote';
 import { PurchaseOrders } from './pages/PurchaseOrders';
 import { Invoice } from './pages/Invoice';
 import { ActivityLog } from './pages/ActivityLog';
+import { ReportsAnalytics } from './pages/ReportsAnalytics';
+import { ApprovalWorkflow } from './pages/ApprovalWorkflow';
 import { AuthProvider, useAuth } from './context/AuthContext';
+
+import { LandingPage } from './pages/LandingPage';
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
@@ -28,17 +32,20 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/rfqs" element={<ProtectedRoute><RFQs /></ProtectedRoute>} />
           <Route path="/compare" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><QuotationComparison /></ProtectedRoute>} />
           <Route path="/submit-quote" element={<ProtectedRoute allowedRoles={['Vendor']}><SubmitQuote /></ProtectedRoute>} />
           <Route path="/purchase-orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
           <Route path="/invoice" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver', 'Vendor']}><Invoice /></ProtectedRoute>} />
           <Route path="/vendors" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><Vendors /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute allowedRoles={['Procurement Officer']}><Settings /></ProtectedRoute>} />
           <Route path="/activity" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><ActivityLog /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><ReportsAnalytics /></ProtectedRoute>} />
+          <Route path="/approvals" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><ApprovalWorkflow /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute allowedRoles={['Procurement Officer']}><Settings /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

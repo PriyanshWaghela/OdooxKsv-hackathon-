@@ -3,15 +3,17 @@ import { useRole } from '../context/AuthContext';
 
 export function Sidebar() {
   const location = useLocation();
-  const { currentRole } = useRole();
+  const { currentRole, user } = useRole();
 
   const allLinks = [
-    { name: 'Dashboard', path: '/', icon: 'dashboard', roles: ['Procurement Officer', 'Vendor', 'Approver'] },
+    { name: 'Dashboard', path: '/dashboard', icon: 'dashboard', roles: ['Procurement Officer', 'Vendor', 'Approver'] },
     { name: 'RFQs', path: '/rfqs', icon: 'request_quote', roles: ['Procurement Officer', 'Vendor', 'Approver'] },
     { name: 'Compare Quotes', path: '/compare', icon: 'compare_arrows', roles: ['Procurement Officer', 'Approver'] },
+    { name: 'Approvals', path: '/approvals', icon: 'fact_check', roles: ['Approver', 'Procurement Officer'] },
     { name: 'Purchase Orders', path: '/purchase-orders', icon: 'receipt_long', roles: ['Procurement Officer', 'Approver', 'Vendor'] },
     { name: 'Vendors', path: '/vendors', icon: 'factory', roles: ['Procurement Officer', 'Approver'] },
-    { name: 'Activity', path: '/activity', icon: 'analytics', roles: ['Procurement Officer', 'Approver'] },
+    { name: 'Activity', path: '/activity', icon: 'list_alt', roles: ['Procurement Officer', 'Approver'] },
+    { name: 'Reports', path: '/reports', icon: 'analytics', roles: ['Procurement Officer', 'Approver'] },
     { name: 'Settings', path: '/settings', icon: 'settings', roles: ['Procurement Officer'] },
   ];
 
@@ -45,11 +47,13 @@ export function Sidebar() {
       </div>
       <div className="mt-auto pt-4 border-t border-outline-variant/30 flex items-center gap-3 p-2">
         <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs">
-          {currentRole.substring(0, 2).toUpperCase()}
+          {currentRole ? currentRole.substring(0, 2).toUpperCase() : 'U'}
         </div>
         <div className="flex-1 overflow-hidden">
-          <p className="font-body-sm font-bold text-on-surface truncate">{currentRole}</p>
-          <p className="font-body-sm text-on-surface-variant text-[10px] truncate">{currentRole.toLowerCase().replace(' ', '.')}@vendorbridge.io</p>
+          <p className="font-body-sm font-bold text-on-surface truncate">
+            {user?.companyName ? `${user.companyName} | ${currentRole}` : currentRole}
+          </p>
+          <p className="font-body-sm text-on-surface-variant text-[10px] truncate">{user?.email || 'user@vendorbridge.io'}</p>
         </div>
       </div>
     </nav>

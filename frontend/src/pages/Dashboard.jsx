@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export function Dashboard() {
     const { currentRole, user } = useAuth();
@@ -16,20 +17,24 @@ export function Dashboard() {
         topVendors: []
     });
     const [rfqs, setRfqs] = useState([]);
+    const [chartData, setChartData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [statsRes, rfqsRes, posRes] = await Promise.all([
+            const [statsRes, rfqsRes, posRes, chartRes] = await Promise.all([
                 fetch('/api/dashboard/stats?_t=' + Date.now()),
                 fetch('/api/rfqs?_t=' + Date.now()),
-                fetch('/api/pos?_t=' + Date.now())
+                fetch('/api/pos?_t=' + Date.now()),
+                fetch('/api/dashboard/chart?_t=' + Date.now())
             ]);
 
             const statsData = await statsRes.json();
             const rfqsData = await rfqsRes.json();
             const posData = await posRes.json();
+            const chartDataRaw = await chartRes.json();
+            setChartData(chartDataRaw);
 
             if (currentRole === 'Vendor') {
                 const vendorRfqs = rfqsData.filter(r => r.status === 'Pending' || r.status === 'Quoted');
@@ -159,7 +164,7 @@ export function Dashboard() {
                     <div className="flex justify-between items-center mb-6">
                         <div>
                             <h3 className="font-headline-md text-headline-md text-on-surface">Procurement Trends</h3>
-                            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Monthly spend vs. projected budget</p>
+                            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Quotes over time</p>
                         </div>
                         <button className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container px-3 py-1.5 rounded-lg transition-colors border border-outline-variant">
                             This Year
@@ -167,26 +172,21 @@ export function Dashboard() {
                         </button>
                     </div>
                     <div className="flex-1 flex items-end gap-4 mt-4 relative pb-6 border-b border-surface-variant/50">
-                        <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-on-surface-variant font-data-mono text-[10px]">
-                            <span>$100k</span><span>$75k</span><span>$50k</span><span>$25k</span><span>0</span>
-                        </div>
-                        <div className="absolute inset-0 left-10 bottom-6 flex flex-col justify-between z-0 pointer-events-none">
-                            <div className="w-full h-px bg-surface-variant/50"></div><div className="w-full h-px bg-surface-variant/50"></div><div className="w-full h-px bg-surface-variant/50"></div><div className="w-full h-px bg-surface-variant/50"></div><div className="w-full h-px"></div>
-                        </div>
-                        <div className="flex-1 flex items-end justify-between pl-12 relative z-10 h-full w-full">
-                            {['Jan', 'Feb', 'Mar', 'Apr', 'May'].map((m, i) => (
-                                <div key={m} className="flex flex-col items-center gap-2 group w-full">
-                                    <div className={`w-full max-w-[40px] bg-primary/20 rounded-t-md relative hover:bg-primary/30 transition-colors cursor-pointer`} style={{height: `${[40, 55, 80, 65, 95][i]}%`}}>
-                                        <div className={`absolute bottom-0 w-full ${m==='May'?'bg-secondary':'bg-primary'} rounded-t-md`} style={{height: `${[60, 70, 50, 85, 40][i]}%`}}></div>
-                                    </div>
-                                    <span className="font-label-caps text-label-caps text-on-surface-variant">{m}</span>
-                                </div>
-                            ))}
-                             <div className="flex flex-col items-center gap-2 group w-full">
-                                <div className="w-full max-w-[40px] bg-surface-container rounded-t-md h-[10%] relative border border-dashed border-outline-variant"></div>
-                                <span className="font-label-caps text-label-caps text-on-surface-variant">Jun</span>
-                            </div>
-                        </div>
+                        {chartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(203, 213, 225, 0.3)" />
+                                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                                    <Tooltip 
+                                        contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                    />
+                                    <Line type="monotone" dataKey="Quotes" stroke="#004ac6" strokeWidth={3} dot={{ fill: '#004ac6', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-on-surface-variant">No chart data available</div>
+                        )}
                     </div>
                 </div>
 
