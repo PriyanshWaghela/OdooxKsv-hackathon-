@@ -10,6 +10,9 @@ export function QuotationComparison() {
 
     const [quotes, setQuotes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [flashMessage, setFlashMessage] = useState(null);
+
+    const [isPOGenerated, setIsPOGenerated] = useState(false);
 
     useEffect(() => {
         if (!rfqId) {
@@ -17,10 +20,18 @@ export function QuotationComparison() {
             return;
         }
 
-        fetch('/api/quotes?_t=' + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                const relatedQuotes = data.filter(q => {
+        // Fetch both quotes and the specific RFQ to check its status
+        Promise.all([
+            fetch('/api/quotes?_t=' + Date.now()).then(res => res.json()),
+            fetch('/api/rfqs?_t=' + Date.now()).then(res => res.json())
+        ])
+        .then(([quotesData, rfqsData]) => {
+            const currentRfq = rfqsData.find(r => String(r._id) === String(rfqId));
+            if (currentRfq && currentRfq.status === 'PO_Generated') {
+                setIsPOGenerated(true);
+            }
+
+            const relatedQuotes = quotesData.filter(q => {
                     const qRfqId = typeof q.rfq === 'object' && q.rfq ? q.rfq._id : q.rfq;
                     return String(qRfqId) === String(rfqId);
                 });
@@ -53,12 +64,17 @@ export function QuotationComparison() {
                     amount: quote.amount
                 })
             });
-            if (!res.ok) throw new Error('Failed to generate PO');
-            alert('Quote Accepted! Official PO has been generated.');
-            navigate('/purchase-orders');
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed to generate PO');
+            
+            setFlashMessage({ type: 'success', text: 'Quote Accepted! Official PO has been generated.' });
+            setTimeout(() => {
+                navigate('/purchase-orders');
+            }, 2000);
         } catch (e) {
             console.error(e);
-            alert('Error generating PO');
+            setFlashMessage({ type: 'error', text: e.message || 'Error generating PO' });
+            setTimeout(() => setFlashMessage(null), 3000);
         }
     };
 
@@ -116,6 +132,11 @@ export function QuotationComparison() {
 
     return (
         <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10 relative overflow-hidden">
+            {flashMessage && (
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-lg font-body-md font-medium text-white transition-all duration-300 ${flashMessage.type === 'success' ? 'bg-secondary' : 'bg-error'}`}>
+                    {flashMessage.text}
+                </div>
+            )}
             <div className="mb-lg flex justify-between items-end shrink-0 mt-4">
                 <div>
                     <div className="flex items-center gap-xs mb-2">
@@ -197,8 +218,20 @@ export function QuotationComparison() {
                                         </span>
                                     </div>
                                     <div className="h-24 px-md border-b border-outline-variant flex items-center justify-center gap-3 bg-surface-container-lowest">
-                                        {['Approver', 'Procurement Officer'].includes(currentRole) ? (
-                                            <>
+                                        {quote.status === 'Accepted' ? (
+                                            <div className="flex-1 bg-emerald-50 text-emerald-700 py-2.5 rounded-lg font-body-sm font-bold text-center border border-emerald-200">
+                                                ✓ Accepted
+                                            </div>
+                                        ) : quote.status === 'Rejected' ? (
+                                            <div className="flex-1 bg-rose-50 text-rose-700 py-2.5 rounded-lg font-body-sm font-bold text-center border border-rose-200">
+                                            ✗ Rejected
+                                        </div>
+                                    ) : isPOGenerated ? (
+                                        <div className="flex-1 bg-slate-100 text-slate-500 py-2.5 rounded-lg font-body-sm font-bold text-center border border-slate-200">
+                                            PO Generated
+                                        </div>
+                                    ) : ['Approver', 'Procurement Officer'].includes(currentRole) ? (
+                                        <>
                                                 <button 
                                                     onClick={() => handleAccept(quote)}
                                                     className="flex-1 py-2.5 bg-primary text-on-primary rounded-lg font-body-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm"

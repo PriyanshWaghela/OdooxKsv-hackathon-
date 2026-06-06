@@ -10,6 +10,8 @@ const UserSchema = new mongoose.Schema({
     default: 'Vendor' 
   },
   companyName: { type: String }, // For Vendors
+  resetPasswordCode: { type: String },
+  resetPasswordExpires: { type: Date }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);

@@ -30,5 +30,11 @@ app.use('/api', poRoutes);
 app.use('/api', dashboardRoutes);
 app.use('/api', activityRoutes);
 
+// Log unregistered routes for debugging
+app.use((req, res, next) => {
+  console.log(`404 Not Found: ${req.method} ${req.url}`);
+  res.status(404).json({ message: 'API route not found' });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

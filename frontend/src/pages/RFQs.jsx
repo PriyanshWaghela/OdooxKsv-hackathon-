@@ -58,6 +58,19 @@ export function RFQs() {
 
   const canCreateRFQ = currentRole === 'Admin' || currentRole === 'Procurement Officer';
 
+  const columns = [
+    { header: 'Title', accessor: 'title' },
+    { header: 'Status', accessor: 'status' },
+    { header: 'Date', accessor: (row) => new Date(row.createdAt).toLocaleDateString() },
+    {
+      header: 'Actions',
+      accessor: (row) => {
+        // Just return the row, let DataTable handle rendering the correct action buttons
+        return row;
+      }
+    }
+  ];
+
   return (
     <div className="flex flex-col gap-lg animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="flex justify-between items-end mb-sm mt-4">
@@ -82,7 +95,7 @@ export function RFQs() {
         </div>
       ) : (
         <div className="bg-surface-container-lowest rounded-xl shadow-[0px_4px_24px_rgba(15,23,42,0.04)] overflow-hidden border border-outline-variant/30">
-          <DataTable data={rfqs} />
+          <DataTable data={rfqs} columns={columns} />
         </div>
       )}
 

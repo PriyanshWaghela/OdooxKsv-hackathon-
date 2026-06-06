@@ -38,7 +38,7 @@ export function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden">
+    <div className="min-h-screen flex flex-1 w-full items-center justify-center bg-slate-50 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 w-full h-full pointer-events-none z-0 opacity-40">
         <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] rounded-full bg-blue-300 blur-[120px]"></div>
         <div className="absolute bottom-[-20%] right-[-20%] w-[50%] h-[50%] rounded-full bg-purple-300 blur-[120px]"></div>

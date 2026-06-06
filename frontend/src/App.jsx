@@ -13,11 +13,12 @@ import { Invoice } from './pages/Invoice';
 import { ActivityLog } from './pages/ActivityLog';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
   
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
   
   return <Layout>{children}</Layout>;
 }
@@ -31,13 +32,13 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/rfqs" element={<ProtectedRoute><RFQs /></ProtectedRoute>} />
-          <Route path="/compare" element={<ProtectedRoute><QuotationComparison /></ProtectedRoute>} />
-          <Route path="/submit-quote" element={<ProtectedRoute><SubmitQuote /></ProtectedRoute>} />
+          <Route path="/compare" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><QuotationComparison /></ProtectedRoute>} />
+          <Route path="/submit-quote" element={<ProtectedRoute allowedRoles={['Vendor']}><SubmitQuote /></ProtectedRoute>} />
           <Route path="/purchase-orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
-          <Route path="/invoice" element={<ProtectedRoute><Invoice /></ProtectedRoute>} />
-          <Route path="/vendors" element={<ProtectedRoute><Vendors /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
+          <Route path="/invoice" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver', 'Vendor']}><Invoice /></ProtectedRoute>} />
+          <Route path="/vendors" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><Vendors /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute allowedRoles={['Procurement Officer']}><Settings /></ProtectedRoute>} />
+          <Route path="/activity" element={<ProtectedRoute allowedRoles={['Procurement Officer', 'Approver']}><ActivityLog /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

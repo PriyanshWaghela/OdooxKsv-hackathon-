@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
+import html2pdf from 'html2pdf.js';
 
 export function Invoice() {
   const [searchParams] = useSearchParams();
@@ -10,6 +12,7 @@ export function Invoice() {
   const [po, setPo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const invoiceRef = React.useRef(null);
 
   useEffect(() => {
     if (!poNumber) return;
@@ -28,7 +31,18 @@ export function Invoice() {
   }, [poNumber]);
 
   const handleDownload = () => {
-    window.print();
+    if (!invoiceRef.current) return;
+    
+    const element = invoiceRef.current;
+    const opt = {
+      margin: 1,
+      filename: `Invoice_${po.poNumber}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    html2pdf().from(element).set(opt).save();
   };
 
   const handleEmail = async () => {
@@ -118,7 +132,7 @@ export function Invoice() {
       </div>
 
       {/* Printable Invoice Container */}
-      <div id="invoice-content" className="bg-surface-container-lowest rounded-2xl shadow-[0px_4px_24px_rgba(15,23,42,0.04)] border border-outline-variant/30 overflow-hidden print:shadow-none print:border-none print:w-full">
+      <div id="invoice-content" ref={invoiceRef} className="bg-surface-container-lowest rounded-2xl shadow-[0px_4px_24px_rgba(15,23,42,0.04)] border border-outline-variant/30 overflow-hidden print:shadow-none print:border-none print:w-full">
         {/* Header Ribbon */}
         <div className="h-4 bg-primary"></div>
         

@@ -10,6 +10,12 @@ router.post('/pos', async (req, res) => {
   try {
     const { rfqId, quoteId, vendorId, amount } = req.body;
     
+    // Check if PO already exists for this RFQ to prevent duplicates
+    const existingPO = await PO.findOne({ rfq: rfqId });
+    if (existingPO) {
+      return res.status(400).json({ message: 'A Purchase Order has already been generated for this RFQ.' });
+    }
+
     const taxAmount = amount * 0.10; // 10% dummy tax
     const totalAmount = amount + taxAmount;
     const poNumber = 'PO-' + Date.now().toString().slice(-6);
@@ -28,6 +34,15 @@ router.post('/pos', async (req, res) => {
 
     // Update RFQ status to PO_Generated
     await RFQ.findByIdAndUpdate(rfqId, { status: 'PO_Generated' });
+
+    // Update the winning Quotation status to Accepted
+    await Quotation.findByIdAndUpdate(quoteId, { status: 'Accepted' });
+
+    // Reject other pending quotations for this RFQ
+    await Quotation.updateMany(
+      { rfq: rfqId, _id: { $ne: quoteId } },
+      { status: 'Rejected' }
+    );
 
     res.status(201).json(savedPO);
   } catch (err) {

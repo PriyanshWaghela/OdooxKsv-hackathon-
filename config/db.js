@@ -4,9 +4,9 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 
 const connectDB = async () => {
   try {
-    const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/vendorbridge';
-    await mongoose.connect(mongoUri);
-    console.log(`MongoDB connected natively at: ${mongoUri}`);
+    const mongoUrl = process.env.MONGODB_URL || "mongodb://localhost:27017/vendorbridge";
+    await mongoose.connect(mongoUrl);
+    console.log(`MongoDB connected natively at: ${mongoUrl}`);
   } catch (err) {
     console.warn('Native MongoDB connection failed (ECONNREFUSED). Falling back to MongoMemoryServer...');
     try {

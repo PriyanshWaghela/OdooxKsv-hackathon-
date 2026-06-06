@@ -57,13 +57,23 @@ export function DataTable({ data }) {
                           Submit Quote
                         </Link>
                       ) : (
-                        <Link 
-                          to={`/compare?rfq=${item._id}`}
-                          className="text-slate-400 hover:text-blue-600 transition-colors p-2 rounded-lg hover:bg-blue-50"
-                          title="View Quotations"
-                        >
-                          <ExternalLink className="w-5 h-5" />
-                        </Link>
+                        item.status === 'PO_Generated' ? (
+                          <Link 
+                            to={`/compare?rfq=${item._id}`}
+                            className="text-emerald-600 hover:text-emerald-800 flex items-center bg-emerald-50 px-3 py-1.5 rounded-lg transition-colors font-medium text-xs whitespace-nowrap"
+                            title="View Accepted Quote"
+                          >
+                            View Accepted Quote
+                          </Link>
+                        ) : (
+                          <Link 
+                            to={`/compare?rfq=${item._id}`}
+                            className="text-slate-400 hover:text-blue-600 transition-colors p-2 rounded-lg hover:bg-blue-50"
+                            title="View Quotations"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </Link>
+                        )
                       )}
                       <button className="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-lg hover:bg-slate-100">
                         <MoreVertical className="w-5 h-5" />

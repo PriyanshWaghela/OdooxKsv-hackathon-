@@ -3,11 +3,11 @@ import { TopBar } from './TopBar';
 
 export function Layout({ children }) {
   return (
-    <div className="flex bg-background text-on-background min-h-screen">
+    <div className="flex bg-background text-on-background min-h-screen w-full flex-1">
       <Sidebar />
       <div className="flex-1 ml-[288px] min-h-screen flex flex-col relative bg-background">
         <TopBar />
-        <main className="flex-1 px-xl pb-xl flex flex-col max-w-container-max relative z-10 overflow-hidden">
+        <main className="flex-1 px-xl pb-xl flex flex-col relative z-10 overflow-hidden w-full">
           {children}
         </main>
       </div>

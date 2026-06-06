@@ -6,6 +6,7 @@ const QuotationSchema = new mongoose.Schema({
   vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   amount: { type: Number, required: true },
   deliveryDate: { type: Date },
+  status: { type: String, enum: ['Pending', 'Accepted', 'Rejected'], default: 'Pending' },
   createdAt: { type: Date, default: Date.now },
 });
 
